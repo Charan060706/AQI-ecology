@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,12 +12,64 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final MapController _mapController = MapController();
-  double _zoomLevel = 14.0; // Default zoom level
+  double _zoomLevel = 14.0; 
+  List<Marker> _markers = []; 
 
-  // Fixed location for the marker
-  static const LatLng fixedLocation = LatLng(13.7072, 79.5945); // San Francisco
+  @override
+  void initState() {
+    super.initState();
+    _fetchLocations(); 
+  }
 
-  // Zoom in function
+  // Fetch locations from Firestore
+ void _fetchLocations() async {
+  FirebaseFirestore.instance.collection('locations').get().then((snapshot) {
+    print("📢 Firestore Query Result: ${snapshot.docs.length} documents found");
+
+    for (var doc in snapshot.docs) {
+      print("📌 Document ID: ${doc.id}");
+      print("📝 Data: ${doc.data()}");
+
+      doc.data().forEach((key, value) {
+        if (value is GeoPoint) { // ✅ Correctly handling Firestore GeoPoints
+          double lat = value.latitude;
+          double lng = value.longitude;
+
+          print("✅ Found GeoPoint -> Lat: $lat, Lng: $lng");
+
+          setState(() {
+            _markers.add(
+              Marker(
+                point: LatLng(lat, lng),
+                width: 40,
+                height: 40,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/location');
+                  },
+                  child: const Icon(
+                    Icons.location_pin,
+                    color: Colors.red,
+                    size: 40,
+                  ),
+                ),
+              ),
+            );
+          });
+        } else {
+          print("⚠️ Skipped field '$key' - Not a valid GeoPoint");
+        }
+      });
+    }
+
+    print("📍 Total Markers Added: ${_markers.length}");
+    setState(() {}); // ✅ Refresh UI to show markers
+  }).catchError((error) {
+    print("❌ Error fetching locations: $error");
+  });
+}
+
+
   void _zoomIn() {
     setState(() {
       _zoomLevel = (_zoomLevel + 1).clamp(2.0, 18.0);
@@ -24,7 +77,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // Zoom out function
   void _zoomOut() {
     setState(() {
       _zoomLevel = (_zoomLevel - 1).clamp(2.0, 18.0);
@@ -44,49 +96,27 @@ class _HomePageState extends State<HomePage> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               elevation: 2,
               child: SizedBox(
-                width: 400, // Square field
+                width: 400,
                 height: 700,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Stack(
                     children: [
                       FlutterMap(
-                        mapController: _mapController, // Attach controller
+                        mapController: _mapController,
                         options: MapOptions(
-                          initialCenter: fixedLocation, // Fixed map center
-                          initialZoom: _zoomLevel, // Initial zoom level
-                          interactionOptions: const InteractionOptions(
-                            flags: InteractiveFlag.all, // Allow panning & zooming
-                          ),
+                          initialCenter: _markers.isNotEmpty ? _markers[0].point : LatLng(13.7072, 79.5945),
+                          initialZoom: _zoomLevel,
+                          interactionOptions: const InteractionOptions(flags: InteractiveFlag.all),
                         ),
                         children: [
                           TileLayer(
                             urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                             subdomains: ['a', 'b', 'c'],
                           ),
-                          // Marker Layer (Pin always at fixedLocation)
-                          MarkerLayer(
-                            markers: [
-                              Marker(
-                                point: fixedLocation,
-                                width: 40,
-                                height: 40,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.pushNamed(context, '/location');
-                                  },
-                                  child: const Icon(
-                                    Icons.location_pin,
-                                    color: Colors.red,
-                                    size: 40,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                          MarkerLayer(markers: _markers),
                         ],
                       ),
-                      // Zoom Buttons
                       Positioned(
                         right: 10,
                         bottom: 10,
@@ -113,13 +143,12 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            const SizedBox(height: 20,  width: 100),
-            ElevatedButton( 
+            const SizedBox(height: 20),
+            ElevatedButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/about');
               },
               child: const Text('About'),
-              
             ),
           ],
         ),
