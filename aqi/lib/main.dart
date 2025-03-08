@@ -1,3 +1,4 @@
+import 'Pages/about.dart';
 import 'package:flutter/material.dart';
 import 'Pages/homepage.dart';
 import 'Pages/location_page.dart';
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomePage(),
         '/location': (context) => const LocationPage(),
         '/historical': (context) => const HistoricalDataPage(),
+        '/about': (context) => const AboutPage(),
       },
     );
   }
