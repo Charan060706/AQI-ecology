@@ -1,10 +1,16 @@
+import 'package:aqi/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+
 import 'Pages/about.dart';
 import 'package:flutter/material.dart';
 import 'Pages/homepage.dart';
 import 'Pages/location_page.dart';
 import 'Pages/historical_data.dart';
 
-void main() {
+void main() async{
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+);
   runApp(const MyApp());
 }
 
