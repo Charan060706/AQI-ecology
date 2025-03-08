@@ -42,10 +42,10 @@ class _HomePageState extends State<HomePage> {
           children: [
             Card(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              elevation: 5,
+              elevation: 2,
               child: SizedBox(
-                width: 300, // Square field
-                height: 300,
+                width: 400, // Square field
+                height: 700,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Stack(
@@ -113,12 +113,13 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
+            const SizedBox(height: 20,  width: 100),
+            ElevatedButton( 
               onPressed: () {
                 Navigator.pushNamed(context, '/about');
               },
               child: const Text('About'),
+              
             ),
           ],
         ),
