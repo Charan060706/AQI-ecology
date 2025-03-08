@@ -13,7 +13,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final MapController _mapController = MapController();
   double _zoomLevel = 14.0; 
-  List<Marker> _markers = []; 
+  final List<Marker> _markers = []; 
 
   @override
   void initState() {

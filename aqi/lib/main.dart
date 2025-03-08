@@ -1,3 +1,4 @@
+import 'package:aqi/Pages/Hello.dart';
 import 'package:aqi/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/home',
       routes: {
-        '/home': (context) => const HomePage(),
+        '/': (context) => const Hello(),
         '/location': (context) => const LocationPage(),
         '/historical': (context) => const HistoricalDataPage(),
         '/about': (context) => const AboutPage(),
