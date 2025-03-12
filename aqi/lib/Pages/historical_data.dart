@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class HistoricalDataPage extends StatelessWidget {
   const HistoricalDataPage({super.key});
@@ -12,11 +13,18 @@ class HistoricalDataPage extends StatelessWidget {
         backgroundColor: Colors.deepPurple,
         elevation: 10,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
+      body: Column(
+        children: [
+          const SizedBox(height: 20),
+          CarouselSlider(
+            options: CarouselOptions(
+              height: 400, // Increased height for the carousel
+              enlargeCenterPage: true, // Enlarge the center graph
+              autoPlay: false, // Disable auto-play
+              enableInfiniteScroll: false, // Disable infinite scroll
+              viewportFraction: 0.8, // Fraction of the viewport to show
+            ),
+            items: [
               _buildChart(
                 title: 'NO Levels Over Time',
                 spots: [
@@ -31,7 +39,6 @@ class HistoricalDataPage extends StatelessWidget {
                 xAxisTitle: 'Time',
                 yAxisTitle: 'NO Concentration (ppm)',
               ),
-              const SizedBox(height: 20),
               _buildChart(
                 title: 'CH4 Levels Over Time',
                 spots: [
@@ -46,7 +53,6 @@ class HistoricalDataPage extends StatelessWidget {
                 xAxisTitle: 'Time',
                 yAxisTitle: 'CH4 Concentration (ppm)',
               ),
-              const SizedBox(height: 20),
               _buildChart(
                 title: 'NH3 Levels Over Time',
                 spots: [
@@ -63,7 +69,7 @@ class HistoricalDataPage extends StatelessWidget {
               ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
@@ -80,6 +86,7 @@ class HistoricalDataPage extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
+      margin: const EdgeInsets.symmetric(horizontal: 10),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -95,7 +102,7 @@ class HistoricalDataPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             SizedBox(
-              height: 200,
+              height: 300, // Increased height for the graph
               child: LineChart(
                 LineChartData(
                   gridData: FlGridData(
