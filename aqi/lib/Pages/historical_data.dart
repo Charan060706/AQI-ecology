@@ -7,7 +7,11 @@ class HistoricalDataPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Historical Data')),
+      appBar: AppBar(
+        title: const Text('Historical Data'),
+        backgroundColor: Colors.deepPurple,
+        elevation: 10,
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -72,7 +76,10 @@ class HistoricalDataPage extends StatelessWidget {
     required String yAxisTitle,
   }) {
     return Card(
-      elevation: 4,
+      elevation: 8,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -83,6 +90,7 @@ class HistoricalDataPage extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
               ),
             ),
             const SizedBox(height: 10),
@@ -90,7 +98,24 @@ class HistoricalDataPage extends StatelessWidget {
               height: 200,
               child: LineChart(
                 LineChartData(
-                  gridData: FlGridData(show: true),
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: true,
+                    horizontalInterval: 0.5,
+                    verticalInterval: 1,
+                    getDrawingHorizontalLine: (value) {
+                      return FlLine(
+                        color: Colors.grey.withOpacity(0.3),
+                        strokeWidth: 1,
+                      );
+                    },
+                    getDrawingVerticalLine: (value) {
+                      return FlLine(
+                        color: Colors.grey.withOpacity(0.3),
+                        strokeWidth: 1,
+                      );
+                    },
+                  ),
                   titlesData: FlTitlesData(
                     show: true,
                     bottomTitles: AxisTitles(
@@ -99,11 +124,16 @@ class HistoricalDataPage extends StatelessWidget {
                         reservedSize: 30,
                         interval: 1,
                         getTitlesWidget: (value, meta) {
-                          // Convert the value to a time string (e.g., 0 -> 12 AM, 1 -> 1 AM, etc.)
                           final hour = value.toInt() % 12;
                           final period = value.toInt() < 12 ? 'AM' : 'PM';
                           final timeLabel = hour == 0 ? '12 $period' : '$hour $period';
-                          return Text(timeLabel);
+                          return Text(
+                            timeLabel,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.black54,
+                            ),
+                          );
                         },
                       ),
                       axisNameWidget: Text(
@@ -111,6 +141,7 @@ class HistoricalDataPage extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple,
                         ),
                       ),
                     ),
@@ -120,7 +151,13 @@ class HistoricalDataPage extends StatelessWidget {
                         interval: 0.5,
                         reservedSize: 40,
                         getTitlesWidget: (value, meta) {
-                          return Text(value.toStringAsFixed(1)); // Y-axis labels
+                          return Text(
+                            value.toStringAsFixed(1),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.black54,
+                            ),
+                          );
                         },
                       ),
                       axisNameWidget: Text(
@@ -128,13 +165,17 @@ class HistoricalDataPage extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple,
                         ),
                       ),
                     ),
                   ),
                   borderData: FlBorderData(
                     show: true,
-                    border: Border.all(color: const Color(0xff37434d), width: 1),
+                    border: Border.all(
+                      color: Colors.grey.withOpacity(0.5),
+                      width: 1,
+                    ),
                   ),
                   minX: 0,
                   maxX: 5,
@@ -147,8 +188,33 @@ class HistoricalDataPage extends StatelessWidget {
                       color: color,
                       barWidth: 4,
                       isStrokeCapRound: true,
-                      dotData: FlDotData(show: true),
-                      belowBarData: BarAreaData(show: false),
+                      dotData: FlDotData(
+                        show: true,
+                        getDotPainter: (spot, percent, barData, index) {
+                          return FlDotCirclePainter(
+                            radius: 4,
+                            color: color,
+                            strokeWidth: 2,
+                            strokeColor: Colors.white,
+                          );
+                        },
+                      ),
+                      belowBarData: BarAreaData(
+                        show: true,
+                        gradient: LinearGradient(
+                          colors: [
+                            color.withOpacity(0.3),
+                            color.withOpacity(0.1),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                      ),
+                      shadow: Shadow(
+                        color: color.withOpacity(0.5),
+                        blurRadius: 8,
+                        offset: const Offset(2, 2),
+                      ),
                     ),
                   ],
                 ),
@@ -160,4 +226,3 @@ class HistoricalDataPage extends StatelessWidget {
     );
   }
 }
-
