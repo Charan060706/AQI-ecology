@@ -19,10 +19,10 @@ class HistoricalDataPage extends StatelessWidget {
           CarouselSlider(
             options: CarouselOptions(
               height: 400, // Increased height for the carousel
-              enlargeCenterPage: true, // Enlarge the center graph
+              enlargeCenterPage: false, // Enlarge the center graph
               autoPlay: false, // Disable auto-play
               enableInfiniteScroll: false, // Disable infinite scroll
-              viewportFraction: 0.8, // Fraction of the viewport to show
+              viewportFraction: 1, // Fraction of the viewport to show
             ),
             items: [
               _buildChart(
@@ -68,9 +68,12 @@ class HistoricalDataPage extends StatelessWidget {
                 yAxisTitle: 'NH3 Concentration (ppm)',
               ),
             ],
+            
           ),
+          
         ],
       ),
+      
     );
   }
 
@@ -88,8 +91,9 @@ class HistoricalDataPage extends StatelessWidget {
       ),
       margin: const EdgeInsets.symmetric(horizontal: 10),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
+        padding: EdgeInsets.fromLTRB(10,10, 10, 20),
+
+       child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -229,7 +233,7 @@ class HistoricalDataPage extends StatelessWidget {
             ),
           ],
         ),
-      ),
+      ), 
     );
   }
 }
