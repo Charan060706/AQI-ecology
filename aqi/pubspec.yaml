@@ -40,6 +40,7 @@ dependencies:
   firebase_core: ^3.12.1
   cloud_firestore: ^5.6.5
   carousel_slider: ^5.0.0
+  flutter_map_cancellable_tile_provider: ^3.1.0
 
 dev_dependencies:
   flutter_test:
