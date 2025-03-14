@@ -7,11 +7,10 @@ import 'Pages/about.dart';
 import 'package:flutter/material.dart';
 import 'Pages/location_page.dart';
 import 'Pages/historical_data.dart';
+import 'Pages/Hello.dart';
 
-void main() async{
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-);
+void main() async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -29,6 +28,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/home',
       routes: {
+        '/' : (context) => const Hello(),
         '/home': (context) => const HomePage(),
         '/location': (context) => const LocationPage(),
         '/historical': (context) => const HistoricalDataPage(),
