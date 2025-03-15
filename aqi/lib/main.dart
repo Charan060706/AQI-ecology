@@ -1,4 +1,4 @@
-import 'package:aqi/Pages/Hello.dart';
+
 import 'package:aqi/Pages/homepage.dart';
 import 'package:aqi/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
