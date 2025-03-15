@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';  // Import Syncfusion Gauge package
 
 class HistoricalDataPage extends StatefulWidget {
   const HistoricalDataPage({super.key});
@@ -14,6 +15,10 @@ class _HistoricalDataPageState extends State<HistoricalDataPage>
   late AnimationController _controller;
   late List<Animation<double>> _animations;
   int _currentIndex = 0;
+
+  // Simulating some AQI value to animate
+  double targetAQI = 150.0;
+  double currentAQI = 0.0;  // Start from zero
 
   final List<List<FlSpot>> _dataSets = [
     [
@@ -49,14 +54,19 @@ class _HistoricalDataPageState extends State<HistoricalDataPage>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 3), // Shortened animation duration (3 seconds)
     );
-    _animations = List.generate(
-      _dataSets.length,
-      (index) => Tween<double>(begin: 0, end: 1).animate(
-        CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-      ),
-    );
+
+    // Start the animation and listen to its value change
+    _controller.addListener(() {
+      setState(() {
+        // Animate from 0 to the target value
+        currentAQI = targetAQI * _controller.value;
+      });
+    });
+
+    // Start the animation
+    _controller.forward();
   }
 
   void _onPageChanged(int index) {
@@ -81,38 +91,101 @@ class _HistoricalDataPageState extends State<HistoricalDataPage>
         backgroundColor: Colors.deepPurple,
         elevation: 10,
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 20),
-          CarouselSlider(
-            options: CarouselOptions(
-              height: 400,
-              enlargeCenterPage: false,
-              autoPlay: false,
-              enableInfiniteScroll: false,
-              viewportFraction: 1,
-              onPageChanged: (index, reason) => _onPageChanged(index),
+      body: SingleChildScrollView( // Wrap the entire body with SingleChildScrollView
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            CarouselSlider(
+              options: CarouselOptions(
+                height: 400,
+                enlargeCenterPage: false,
+                autoPlay: false,
+                enableInfiniteScroll: false,
+                viewportFraction: 1,
+                onPageChanged: (index, reason) => _onPageChanged(index),
+              ),
+              items: List.generate(_dataSets.length, (index) {
+                return _buildChart(
+                  title: index == 0
+                      ? 'NO Levels Over Time'
+                      : index == 1
+                          ? 'CH4 Levels Over Time'
+                          : 'NH3 Levels Over Time',
+                  spots: _dataSets[index],
+                  color: _colors[index],
+                  xAxisTitle: 'Time',
+                  yAxisTitle: index == 0
+                      ? 'NO Concentration (ppm)'
+                      : index == 1
+                          ? 'CH4 Concentration (ppm)'
+                          : 'NH3 Concentration (ppm)',
+                  isAnimated: index == _currentIndex,
+                );
+              }),
             ),
-            items: List.generate(_dataSets.length, (index) {
-              return _buildChart(
-                title: index == 0
-                    ? 'NO Levels Over Time'
-                    : index == 1
-                        ? 'CH4 Levels Over Time'
-                        : 'NH3 Levels Over Time',
-                spots: _dataSets[index],
-                color: _colors[index],
-                xAxisTitle: 'Time',
-                yAxisTitle: index == 0
-                    ? 'NO Concentration (ppm)'
-                    : index == 1
-                        ? 'CH4 Concentration (ppm)'
-                        : 'NH3 Concentration (ppm)',
-                isAnimated: index == _currentIndex,
-              );
-            }),
-          ),
-        ],
+            const SizedBox(height: 20), // Space between chart and gauge
+            // Add the Gauge Chart with animation
+            AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return SizedBox(
+                  height: 200, // Set appropriate height for the gauge
+                  child: SfRadialGauge(
+                    axes: [
+                      RadialAxis(
+                        minimum: 0,
+                        maximum: 500,
+                        ranges: [
+                          GaugeRange(
+                            startValue: 0,
+                            endValue: 100,
+                            color: Colors.green,
+                            startWidth: 10,
+                            endWidth: 10,
+                          ),
+                          GaugeRange(
+                            startValue: 100,
+                            endValue: 200,
+                            color: Colors.yellow,
+                            startWidth: 10,
+                            endWidth: 10,
+                          ),
+                          GaugeRange(
+                            startValue: 200,
+                            endValue: 300,
+                            color: Colors.orange,
+                            startWidth: 10,
+                            endWidth: 10,
+                          ),
+                          GaugeRange(
+                            startValue: 300,
+                            endValue: 500,
+                            color: Colors.red,
+                            startWidth: 10,
+                            endWidth: 10,
+                          ),
+                        ],
+                        pointers: [
+                          NeedlePointer(value: currentAQI) // Animate needle to current AQI
+                        ],
+                        annotations: [
+                          GaugeAnnotation(
+                            widget: Text(
+                              '${currentAQI.toStringAsFixed(0)}', // Display the animated AQI value
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            positionFactor: 0.9,
+                            angle: 90,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -148,7 +221,7 @@ class _HistoricalDataPageState extends State<HistoricalDataPage>
             SizedBox(
               height: 300,
               child: AnimatedBuilder(
-                animation: _animations[_currentIndex],
+                animation: _controller,
                 builder: (context, child) {
                   return LineChart(
                     LineChartData(
@@ -161,7 +234,7 @@ class _HistoricalDataPageState extends State<HistoricalDataPage>
                           spots: spots
                               .map((spot) => FlSpot(
                                     spot.x,
-                                    spot.y * (isAnimated ? _animations[_currentIndex].value : 0),
+                                    spot.y * (isAnimated ? _controller.value : 0),
                                   ))
                               .toList(),
                           isCurved: true,
