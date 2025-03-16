@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+//import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeProvider with ChangeNotifier {
   bool _isDarkMode = false;
@@ -16,13 +16,13 @@ class ThemeProvider with ChangeNotifier {
   }
 
   Future<void> _loadTheme() async {
-    final prefs = await SharedPreferences.getInstance();
-    _isDarkMode = prefs.getBool('isDarkMode') ?? false;
+    //final prefs = await SharedPreferences.getInstance();
+   // _isDarkMode = prefs.getBool('isDarkMode') ?? false;
     notifyListeners(); // ✅ Fixes the error!
   }
 
   Future<void> _saveTheme(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool('isDarkMode', value);
+    //final prefs = await SharedPreferences.getInstance();
+    //prefs.setBool('isDarkMode', value);
   }
 }

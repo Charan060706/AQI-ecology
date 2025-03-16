@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const GradientWrapper(child: Hello()), // Apply wrapper to pages
         '/home': (context) => const GradientWrapper(child: HomePage()),
         '/location': (context) => const GradientWrapper(child: LocationPage()),
-        //'/historical': (context) => const GradientWrapper(child: HistoricalDataPage()),
+        '/historical': (context) => const GradientWrapper(child: HistoricalDataPage()),
         '/about': (context) => const GradientWrapper(child: AboutPage()),
       },
     );
