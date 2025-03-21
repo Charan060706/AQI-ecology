@@ -15,24 +15,34 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool isDarkMode = false; // Global theme state
+
+  void toggleTheme() {
+    setState(() {
+      isDarkMode = !isDarkMode;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter App',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      theme: isDarkMode ? ThemeData.dark() : ThemeData.light(), // Apply theme dynamically
       initialRoute: '/home',
       routes: {
-        '/': (context) => const GradientWrapper(child: Hello()), // Apply wrapper to pages
-        '/home': (context) => const GradientWrapper(child: HomePage()),
-        '/location': (context) => const GradientWrapper(child: LocationPage()),
-        '/historical': (context) => const GradientWrapper(child: HistoricalDataPage()),
+        //'/': (context) => GradientWrapper(child: Hello(toggleTheme: toggleTheme, isDarkMode: isDarkMode)), 
+        '/home': (context) => GradientWrapper(child: HomePage(toggleTheme: toggleTheme, isDarkMode: isDarkMode)),
+        '/location': (context) => GradientWrapper(child: LocationPage()),
+        '/historical': (context) => GradientWrapper(child: HistoricalDataPage()),
         '/about': (context) => GradientWrapper(child: AboutPage()),
       },
     );

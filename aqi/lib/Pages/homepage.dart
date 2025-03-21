@@ -7,7 +7,10 @@ import 'about.dart';
 import 'location_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final VoidCallback toggleTheme;
+  final bool isDarkMode;
+
+  const HomePage({super.key, required this.toggleTheme, required this.isDarkMode});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -24,109 +27,69 @@ class _HomePageState extends State<HomePage> {
     _fetchLocations();
   }
 
-  // Fetch locations from Firestore
   void _fetchLocations() async {
-    FirebaseFirestore.instance
-        .collection('locations')
-        .get()
-        .then((snapshot) {
-          print(
-            "📢 Firestore Query Result: ${snapshot.docs.length} documents found",
-          );
+    FirebaseFirestore.instance.collection('locations').get().then((snapshot) {
+      for (var doc in snapshot.docs) {
+        doc.data().forEach((key, value) {
+          if (value is GeoPoint) {
+            double lat = value.latitude;
+            double lng = value.longitude;
 
-          for (var doc in snapshot.docs) {
-            print("📌 Document ID: ${doc.id}");
-            print("📝 Data: ${doc.data()}");
+            setState(() {
+              _markers.add(
+                Marker(
+                  point: LatLng(lat, lng),
+                  width: 40,
+                  height: 40,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation, secondaryAnimation) =>
+                              const LocationPage(),
+                          transitionDuration: const Duration(milliseconds: 500),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            var begin = const Offset(0.0, 1.0);
+                            var end = Offset.zero;
+                            var curve = Curves.easeInOut;
 
-            doc.data().forEach((key, value) {
-              if (value is GeoPoint) {
-                double lat = value.latitude;
-                double lng = value.longitude;
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+                            var offsetAnimation = animation.drive(tween);
 
-                print("✅ Found GeoPoint -> Lat: $lat, Lng: $lng");
-
-                setState(() {
-                  _markers.add(
-                    Marker(
-                      point: LatLng(lat, lng),
-                      width: 40,
-                      height: 40,
-                      child: GestureDetector(
-                        onTap: () {
-                          // Navigate to LocationHistory page with custom transition
-                          Navigator.of(context).push(
-                            PageRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      LocationPage(), // Location page to navigate to
-                              transitionDuration: const Duration(
-                                milliseconds: 500,
-                              ),
-                              transitionsBuilder: (
-                                context,
-                                animation,
-                                secondaryAnimation,
-                                child,
-                              ) {
-                                var begin = const Offset(
-                                  0.0,
-                                  1.0,
-                                ); // Slide from bottom
-                                var end = Offset.zero; // End at the center
-                                var curve = Curves.easeInOut;
-
-                                var tween = Tween(
-                                  begin: begin,
-                                  end: end,
-                                ).chain(CurveTween(curve: curve));
-                                var offsetAnimation = animation.drive(tween);
-
-                                return Stack(
-                                  children: [
-                                    // Background blur effect
-                                    Positioned.fill(
-                                      child: BackdropFilter(
-                                        filter: ImageFilter.blur(
-                                          sigmaX: 5.0,
-                                          sigmaY: 5.0,
-                                        ),
-                                        child: Container(
-                                          color: Colors.black.withOpacity(0.5),
-                                        ),
-                                      ),
-                                    ),
-                                    // Popup window (LocationHistoryPage) transition
-                                    SlideTransition(
-                                      position: offsetAnimation,
-                                      child: child,
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          );
-                        },
-                        child: const Icon(
-                          Icons.location_pin,
-                          color: Colors.red,
-                          size: 40,
+                            return Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: BackdropFilter(
+                                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                                    child: Container(
+                                        color: Colors.black.withOpacity(0.5)),
+                                  ),
+                                ),
+                                SlideTransition(position: offsetAnimation, child: child),
+                              ],
+                            );
+                          },
                         ),
-                      ),
+                      );
+                    },
+                    child: Icon(
+                      Icons.location_pin,
+                      color: widget.isDarkMode ? Colors.orangeAccent : Colors.red,
+                      size: 40,
                     ),
-                  );
-                });
-              } else {
-                print("⚠️ Skipped field '$key' - Not a valid GeoPoint");
-              }
+                  ),
+                ),
+              );
             });
           }
-
-          print("📍 Total Markers Added: ${_markers.length}");
-          setState(() {}); // Refresh UI to show markers
-        })
-        .catchError((error) {
-          print("❌ Error fetching locations: $error");
         });
+      }
+      setState(() {});
+    }).catchError((error) {
+      print("Error fetching locations: $error");
+    });
   }
 
   void _zoomIn() {
@@ -146,12 +109,45 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Home Page')),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(56.0),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: widget.isDarkMode
+                  ? [Colors.black, Colors.white54] // Dark Mode: Black → White gradient
+                  : [Colors.blue, Colors.lightBlueAccent], // Light Mode: Blue → Light Blue gradient
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+          child: AppBar(
+            title: const Text('Home Page'),
+            backgroundColor: Colors.transparent, // Make AppBar transparent to show gradient
+            elevation: 0, // Remove shadow for a modern look
+            actions: [
+              IconButton(
+                icon: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  transitionBuilder: (child, animation) {
+                    return RotationTransition(turns: animation, child: child);
+                  },
+                  child: widget.isDarkMode
+                      ? const Icon(Icons.dark_mode, key: ValueKey('dark'), color: Colors.white)
+                      : const Icon(Icons.wb_sunny, key: ValueKey('light'), color: Colors.orange),
+                ),
+                onPressed: widget.toggleTheme,
+              ),
+            ],
+          ),
+        ),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Card(
+              color: widget.isDarkMode ? Colors.grey[900] : Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -166,19 +162,15 @@ class _HomePageState extends State<HomePage> {
                       FlutterMap(
                         mapController: _mapController,
                         options: MapOptions(
-                          initialCenter:
-                              _markers.isNotEmpty
-                                  ? _markers[0].point
-                                  : LatLng(13.7072, 79.5945),
+                          initialCenter: _markers.isNotEmpty
+                              ? _markers[0].point
+                              : LatLng(13.7072, 79.5945),
                           initialZoom: _zoomLevel,
-                          interactionOptions: const InteractionOptions(
-                            flags: InteractiveFlag.all,
-                          ),
+                          interactionOptions: const InteractionOptions(flags: InteractiveFlag.all),
                         ),
                         children: [
                           TileLayer(
-                            urlTemplate:
-                                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                            urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                             subdomains: ['a', 'b', 'c'],
                           ),
                           MarkerLayer(markers: _markers),
@@ -191,6 +183,7 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             FloatingActionButton(
                               mini: true,
+                              backgroundColor: widget.isDarkMode ? Colors.white24 : Colors.blue,
                               heroTag: "zoom_in",
                               onPressed: _zoomIn,
                               child: const Icon(Icons.add),
@@ -198,6 +191,7 @@ class _HomePageState extends State<HomePage> {
                             const SizedBox(height: 5),
                             FloatingActionButton(
                               mini: true,
+                              backgroundColor: widget.isDarkMode ? Colors.white24 : Colors.blue,
                               heroTag: "zoom_out",
                               onPressed: _zoomOut,
                               child: const Icon(Icons.remove),
@@ -210,61 +204,46 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                // Apply right-side page transition for "About" page
+            const SizedBox(height: 20),
+            InkWell(
+              onTap: () {
                 Navigator.of(context).push(
-                  PageRouteBuilder(
-                    transitionDuration: const Duration(milliseconds: 500),
-                    reverseTransitionDuration: const Duration(
-                      milliseconds: 500,
-                    ),
-                    pageBuilder:
-                        (context, animation, secondaryAnimation) =>
-                             AboutPage(),
-                    transitionsBuilder: (
-                      context,
-                      animation,
-                      secondaryAnimation,
-                      child,
-                    ) {
-                      var begin = const Offset(1.0, 0.0); // Slide from right
-                      var end = Offset.zero; // End at the center
-                      var curve = Curves.easeInOut;
-
-                      var tween = Tween(
-                        begin: begin,
-                        end: end,
-                      ).chain(CurveTween(curve: curve));
-                      var offsetAnimation = animation.drive(tween);
-
-                      return Stack(
-                        children: [
-                          // Background blur effect
-                          Positioned.fill(
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(
-                                sigmaX: 5.0,
-                                sigmaY: 5.0,
-                              ),
-                              child: Container(
-                                color: Colors.black.withOpacity(0.5),
-                              ),
-                            ),
-                          ),
-                          // Slide transition for the About Page
-                          SlideTransition(
-                            position: offsetAnimation,
-                            child: child,
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+                  MaterialPageRoute(builder: (context) =>  AboutPage()),
                 );
               },
-              child: const Text('About'),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: widget.isDarkMode
+                        ? [Colors.deepPurpleAccent, Colors.blueAccent]
+                        : [Colors.blueAccent, Colors.deepPurpleAccent],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.info_outline, size: 24, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text(
+                      'About',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -272,3 +251,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
