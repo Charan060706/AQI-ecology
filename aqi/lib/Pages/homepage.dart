@@ -109,23 +109,38 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home Page'),
-        backgroundColor: widget.isDarkMode ? const Color.fromARGB(221, 56, 54, 54) : const Color.fromARGB(255, 130, 170, 239),
-        actions: [
-          IconButton(
-            icon: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 500),
-              transitionBuilder: (child, animation) {
-                return RotationTransition(turns: animation, child: child);
-              },
-              child: widget.isDarkMode
-                  ? const Icon(Icons.dark_mode, key: ValueKey('dark'), color: Colors.white)
-                  : const Icon(Icons.wb_sunny, key: ValueKey('light'), color: Colors.orange),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(56.0),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: widget.isDarkMode
+                  ? [Colors.black, Colors.white54] // Dark Mode: Black → White gradient
+                  : [Colors.blue, Colors.lightBlueAccent], // Light Mode: Blue → Light Blue gradient
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
             ),
-            onPressed: widget.toggleTheme,
           ),
-        ],
+          child: AppBar(
+            title: const Text('Home Page'),
+            backgroundColor: Colors.transparent, // Make AppBar transparent to show gradient
+            elevation: 0, // Remove shadow for a modern look
+            actions: [
+              IconButton(
+                icon: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  transitionBuilder: (child, animation) {
+                    return RotationTransition(turns: animation, child: child);
+                  },
+                  child: widget.isDarkMode
+                      ? const Icon(Icons.dark_mode, key: ValueKey('dark'), color: Colors.white)
+                      : const Icon(Icons.wb_sunny, key: ValueKey('light'), color: Colors.orange),
+                ),
+                onPressed: widget.toggleTheme,
+              ),
+            ],
+          ),
+        ),
       ),
       body: Center(
         child: Column(
@@ -190,35 +205,10 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 20),
-
             InkWell(
               onTap: () {
                 Navigator.of(context).push(
-                  PageRouteBuilder(
-                    transitionDuration: const Duration(milliseconds: 500),
-                    reverseTransitionDuration: const Duration(milliseconds: 500),
-                    pageBuilder: (context, animation, secondaryAnimation) => const AboutPage(),
-                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                      var begin = const Offset(1.0, 0.0);
-                      var end = Offset.zero;
-                      var curve = Curves.easeInOut;
-
-                      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-                      var offsetAnimation = animation.drive(tween);
-
-                      return Stack(
-                        children: [
-                          Positioned.fill(
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                              child: Container(color: Colors.black.withOpacity(0.5)),
-                            ),
-                          ),
-                          SlideTransition(position: offsetAnimation, child: child),
-                        ],
-                      );
-                    },
-                  ),
+                  MaterialPageRoute(builder: (context) => const AboutPage()),
                 );
               },
               child: AnimatedContainer(
@@ -228,7 +218,7 @@ class _HomePageState extends State<HomePage> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: widget.isDarkMode
-                        ? [ Colors.deepPurpleAccent,Colors.blueAccent ]
+                        ? [Colors.deepPurpleAccent, Colors.blueAccent]
                         : [Colors.blueAccent, Colors.deepPurpleAccent],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -261,3 +251,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
