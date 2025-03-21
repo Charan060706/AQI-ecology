@@ -30,7 +30,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -42,10 +41,26 @@ dependencies:
   carousel_slider: ^5.0.0
   syncfusion_flutter_gauges: ^20.1.50 #added by charan
   flutter_map_cancellable_tile_provider: ^3.1.0
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.3.6
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/app_icon.png"  # Path to your icon (1024x1024 recommended)
+  adaptive_icon_background: "#ffffff" # Background for adaptive icons (Android)
+  adaptive_icon_foreground: "assets/appicon.png"
+  
+flutter_native_splash:
+  color: "#ffffff"  # Background color
+  image: assets/app_logo.png  # Path to your splash icon (512x512 recommended)
+  android: true
+  ios: true
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -59,7 +74,31 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
+  assets:
+   - assets/app_logo.jpg
+   - assets/instructor.jpg
+   - assets/software-1.png
+   - assets/software-2.png
+   - assets/software-3.png
+   - assets/software-4.png
+   - assets/software-5.png
+   - assets/software-6.png
+   - assets/software-7.png
+   - assets/software-8.png
+   - assets/software-9.png
+   - assets/hardware-1.png
+   - assets/hardware-2.png
+   - assets/hardware-3.png
+   - assets/hardware-4.png
+   - assets/hardware-5.png
+   - assets/hardware-6.png
+   - assets/hardware-7.png
+   - assets/hardware-8.png
+   - assets/bme280.png
+   - assets/mics6814.png
+   - assets/esp32.png
+   - assets/lora.png
+   - assets/appicon.png
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

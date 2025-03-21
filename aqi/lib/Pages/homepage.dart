@@ -222,7 +222,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     pageBuilder:
                         (context, animation, secondaryAnimation) =>
-                            const AboutPage(),
+                             AboutPage(),
                     transitionsBuilder: (
                       context,
                       animation,
