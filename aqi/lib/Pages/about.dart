@@ -87,7 +87,11 @@ class _AboutPageState extends State<AboutPage> {
               /// App Logo & Name
               Column(
                 children: [
-                  Image.asset("assets/app_logo.jpg", width: 100, height: 100),
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: AssetImage("assets/app_logo.jpg"),
+                    backgroundColor: Colors.white,
+                  ),
                   SizedBox(height: 10),
                   Text(
                     "Air-Index",
@@ -97,7 +101,7 @@ class _AboutPageState extends State<AboutPage> {
               ),
               SizedBox(height: 20),
 
-              /// Description Slideshow (Expands to Fit Text)
+              /// Description Slideshow (Cards with Elevation)
               ConstrainedBox(
                 constraints: BoxConstraints(
                   minHeight: 150,
@@ -107,9 +111,14 @@ class _AboutPageState extends State<AboutPage> {
                   controller: _descController,
                   itemCount: descriptions.length,
                   itemBuilder: (context, index) {
-                    return IntrinsicHeight(
-                      child: Container(
-                        padding: EdgeInsets.all(15),
+                    return Card(
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      margin: EdgeInsets.symmetric(vertical: 10),
+                      child: Padding(
+                        padding: const EdgeInsets.all(15),
                         child: Center(
                           child: Text(
                             descriptions[index],
@@ -158,26 +167,25 @@ class _AboutPageState extends State<AboutPage> {
               SizedBox(height: 40), // More space before instructor section
 
               /// Instructor Section
-              /// Instructor Section with Heading
-            Column(
-              children: [
-              Text(
-                "Instructor",
-                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal),
+              Column(
+                children: [
+                  Text(
+                    "Instructor",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal),
                   ),
-              SizedBox(height: 10), // Spacing between heading and image
-            CircleAvatar(
-                 radius: 50,
-                 backgroundImage: AssetImage("assets/instructor.jpg"),
+                  SizedBox(height: 10), // Spacing between heading and image
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: AssetImage("assets/instructor.jpg"),
                   ),
-                   SizedBox(height: 20),
-                 Text(
-                      "Dr. Suresh Jain",
-                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                         ),
-                      ],
-                        ),
-                      SizedBox(height: 40),  // Increased space before teams
+                  SizedBox(height: 20),
+                  Text(
+                    "Dr. Suresh Jain",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              SizedBox(height: 40), // Increased space before teams
 
               /// Software Development Team
               TeamSection(
