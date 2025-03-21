@@ -24,109 +24,68 @@ class _HomePageState extends State<HomePage> {
     _fetchLocations();
   }
 
-  // Fetch locations from Firestore
   void _fetchLocations() async {
-    FirebaseFirestore.instance
-        .collection('locations')
-        .get()
-        .then((snapshot) {
-          print(
-            "📢 Firestore Query Result: ${snapshot.docs.length} documents found",
-          );
+    FirebaseFirestore.instance.collection('locations').get().then((snapshot) {
+      for (var doc in snapshot.docs) {
+        doc.data().forEach((key, value) {
+          if (value is GeoPoint) {
+            double lat = value.latitude;
+            double lng = value.longitude;
 
-          for (var doc in snapshot.docs) {
-            print("📌 Document ID: ${doc.id}");
-            print("📝 Data: ${doc.data()}");
+            setState(() {
+              _markers.add(
+                Marker(
+                  point: LatLng(lat, lng),
+                  width: 40,
+                  height: 40,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation, secondaryAnimation) =>
+                              LocationPage(),
+                          transitionDuration: const Duration(milliseconds: 500),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            var begin = const Offset(0.0, 1.0);
+                            var end = Offset.zero;
+                            var curve = Curves.easeInOut;
 
-            doc.data().forEach((key, value) {
-              if (value is GeoPoint) {
-                double lat = value.latitude;
-                double lng = value.longitude;
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+                            var offsetAnimation = animation.drive(tween);
 
-                print("✅ Found GeoPoint -> Lat: $lat, Lng: $lng");
-
-                setState(() {
-                  _markers.add(
-                    Marker(
-                      point: LatLng(lat, lng),
-                      width: 40,
-                      height: 40,
-                      child: GestureDetector(
-                        onTap: () {
-                          // Navigate to LocationHistory page with custom transition
-                          Navigator.of(context).push(
-                            PageRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      LocationPage(), // Location page to navigate to
-                              transitionDuration: const Duration(
-                                milliseconds: 500,
-                              ),
-                              transitionsBuilder: (
-                                context,
-                                animation,
-                                secondaryAnimation,
-                                child,
-                              ) {
-                                var begin = const Offset(
-                                  0.0,
-                                  1.0,
-                                ); // Slide from bottom
-                                var end = Offset.zero; // End at the center
-                                var curve = Curves.easeInOut;
-
-                                var tween = Tween(
-                                  begin: begin,
-                                  end: end,
-                                ).chain(CurveTween(curve: curve));
-                                var offsetAnimation = animation.drive(tween);
-
-                                return Stack(
-                                  children: [
-                                    // Background blur effect
-                                    Positioned.fill(
-                                      child: BackdropFilter(
-                                        filter: ImageFilter.blur(
-                                          sigmaX: 5.0,
-                                          sigmaY: 5.0,
-                                        ),
-                                        child: Container(
-                                          color: Colors.black.withOpacity(0.5),
-                                        ),
-                                      ),
-                                    ),
-                                    // Popup window (LocationHistoryPage) transition
-                                    SlideTransition(
-                                      position: offsetAnimation,
-                                      child: child,
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          );
-                        },
-                        child: const Icon(
-                          Icons.location_pin,
-                          color: Colors.red,
-                          size: 40,
+                            return Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: BackdropFilter(
+                                    filter: ImageFilter.blur(
+                                        sigmaX: 5.0, sigmaY: 5.0),
+                                    child: Container(
+                                        color: Colors.black.withOpacity(0.5)),
+                                  ),
+                                ),
+                                SlideTransition(
+                                    position: offsetAnimation, child: child),
+                              ],
+                            );
+                          },
                         ),
-                      ),
-                    ),
-                  );
-                });
-              } else {
-                print("⚠️ Skipped field '$key' - Not a valid GeoPoint");
-              }
+                      );
+                    },
+                    child: const Icon(Icons.location_pin,
+                        color: Colors.red, size: 40),
+                  ),
+                ),
+              );
             });
           }
-
-          print("📍 Total Markers Added: ${_markers.length}");
-          setState(() {}); // Refresh UI to show markers
-        })
-        .catchError((error) {
-          print("❌ Error fetching locations: $error");
         });
+      }
+      setState(() {});
+    }).catchError((error) {
+      print("Error fetching locations: $error");
+    });
   }
 
   void _zoomIn() {
@@ -166,14 +125,12 @@ class _HomePageState extends State<HomePage> {
                       FlutterMap(
                         mapController: _mapController,
                         options: MapOptions(
-                          initialCenter:
-                              _markers.isNotEmpty
-                                  ? _markers[0].point
-                                  : LatLng(13.7072, 79.5945),
+                          initialCenter: _markers.isNotEmpty
+                              ? _markers[0].point
+                              : LatLng(13.7072, 79.5945),
                           initialZoom: _zoomLevel,
-                          interactionOptions: const InteractionOptions(
-                            flags: InteractiveFlag.all,
-                          ),
+                          interactionOptions:
+                              const InteractionOptions(flags: InteractiveFlag.all),
                         ),
                         children: [
                           TileLayer(
@@ -210,61 +167,78 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                // Apply right-side page transition for "About" page
+            const SizedBox(height: 20),
+
+          
+            InkWell(
+              onTap: () {
                 Navigator.of(context).push(
                   PageRouteBuilder(
                     transitionDuration: const Duration(milliseconds: 500),
-                    reverseTransitionDuration: const Duration(
-                      milliseconds: 500,
-                    ),
-                    pageBuilder:
-                        (context, animation, secondaryAnimation) =>
-                            const AboutPage(),
-                    transitionsBuilder: (
-                      context,
-                      animation,
-                      secondaryAnimation,
-                      child,
-                    ) {
-                      var begin = const Offset(1.0, 0.0); // Slide from right
-                      var end = Offset.zero; // End at the center
+                    reverseTransitionDuration: const Duration(milliseconds: 500),
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        const AboutPage(),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      var begin = const Offset(1.0, 0.0);
+                      var end = Offset.zero;
                       var curve = Curves.easeInOut;
 
-                      var tween = Tween(
-                        begin: begin,
-                        end: end,
-                      ).chain(CurveTween(curve: curve));
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
                       var offsetAnimation = animation.drive(tween);
 
                       return Stack(
                         children: [
-                          // Background blur effect
                           Positioned.fill(
                             child: BackdropFilter(
-                              filter: ImageFilter.blur(
-                                sigmaX: 5.0,
-                                sigmaY: 5.0,
-                              ),
+                              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                               child: Container(
-                                color: Colors.black.withOpacity(0.5),
-                              ),
+                                  color: Colors.black.withOpacity(0.5)),
                             ),
                           ),
-                          // Slide transition for the About Page
-                          SlideTransition(
-                            position: offsetAnimation,
-                            child: child,
-                          ),
+                          SlideTransition(position: offsetAnimation, child: child),
                         ],
                       );
                     },
                   ),
                 );
               },
-              child: const Text('About'),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Colors.blueAccent, Colors.deepPurpleAccent],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.info_outline, size: 24, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text(
+                      'About',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
