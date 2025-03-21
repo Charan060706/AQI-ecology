@@ -7,7 +7,10 @@ import 'about.dart';
 import 'location_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final VoidCallback toggleTheme;
+  final bool isDarkMode;
+
+  const HomePage({super.key, required this.toggleTheme, required this.isDarkMode});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -43,7 +46,7 @@ class _HomePageState extends State<HomePage> {
                       Navigator.of(context).push(
                         PageRouteBuilder(
                           pageBuilder: (context, animation, secondaryAnimation) =>
-                              LocationPage(),
+                              const LocationPage(),
                           transitionDuration: const Duration(milliseconds: 500),
                           transitionsBuilder:
                               (context, animation, secondaryAnimation, child) {
@@ -59,22 +62,23 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 Positioned.fill(
                                   child: BackdropFilter(
-                                    filter: ImageFilter.blur(
-                                        sigmaX: 5.0, sigmaY: 5.0),
+                                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                                     child: Container(
                                         color: Colors.black.withOpacity(0.5)),
                                   ),
                                 ),
-                                SlideTransition(
-                                    position: offsetAnimation, child: child),
+                                SlideTransition(position: offsetAnimation, child: child),
                               ],
                             );
                           },
                         ),
                       );
                     },
-                    child: const Icon(Icons.location_pin,
-                        color: Colors.red, size: 40),
+                    child: Icon(
+                      Icons.location_pin,
+                      color: widget.isDarkMode ? Colors.orangeAccent : Colors.red,
+                      size: 40,
+                    ),
                   ),
                 ),
               );
@@ -105,12 +109,30 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Home Page')),
+      appBar: AppBar(
+        title: const Text('Home Page'),
+        backgroundColor: widget.isDarkMode ? const Color.fromARGB(221, 56, 54, 54) : const Color.fromARGB(255, 130, 170, 239),
+        actions: [
+          IconButton(
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 500),
+              transitionBuilder: (child, animation) {
+                return RotationTransition(turns: animation, child: child);
+              },
+              child: widget.isDarkMode
+                  ? const Icon(Icons.dark_mode, key: ValueKey('dark'), color: Colors.white)
+                  : const Icon(Icons.wb_sunny, key: ValueKey('light'), color: Colors.orange),
+            ),
+            onPressed: widget.toggleTheme,
+          ),
+        ],
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Card(
+              color: widget.isDarkMode ? Colors.grey[900] : Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -129,13 +151,11 @@ class _HomePageState extends State<HomePage> {
                               ? _markers[0].point
                               : LatLng(13.7072, 79.5945),
                           initialZoom: _zoomLevel,
-                          interactionOptions:
-                              const InteractionOptions(flags: InteractiveFlag.all),
+                          interactionOptions: const InteractionOptions(flags: InteractiveFlag.all),
                         ),
                         children: [
                           TileLayer(
-                            urlTemplate:
-                                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                            urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                             subdomains: ['a', 'b', 'c'],
                           ),
                           MarkerLayer(markers: _markers),
@@ -148,6 +168,7 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             FloatingActionButton(
                               mini: true,
+                              backgroundColor: widget.isDarkMode ? Colors.white24 : Colors.blue,
                               heroTag: "zoom_in",
                               onPressed: _zoomIn,
                               child: const Icon(Icons.add),
@@ -155,6 +176,7 @@ class _HomePageState extends State<HomePage> {
                             const SizedBox(height: 5),
                             FloatingActionButton(
                               mini: true,
+                              backgroundColor: widget.isDarkMode ? Colors.white24 : Colors.blue,
                               heroTag: "zoom_out",
                               onPressed: _zoomOut,
                               child: const Icon(Icons.remove),
@@ -169,23 +191,19 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 20),
 
-          
             InkWell(
               onTap: () {
                 Navigator.of(context).push(
                   PageRouteBuilder(
                     transitionDuration: const Duration(milliseconds: 500),
                     reverseTransitionDuration: const Duration(milliseconds: 500),
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const AboutPage(),
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
+                    pageBuilder: (context, animation, secondaryAnimation) => const AboutPage(),
+                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
                       var begin = const Offset(1.0, 0.0);
                       var end = Offset.zero;
                       var curve = Curves.easeInOut;
 
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
+                      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
                       var offsetAnimation = animation.drive(tween);
 
                       return Stack(
@@ -193,8 +211,7 @@ class _HomePageState extends State<HomePage> {
                           Positioned.fill(
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                              child: Container(
-                                  color: Colors.black.withOpacity(0.5)),
+                              child: Container(color: Colors.black.withOpacity(0.5)),
                             ),
                           ),
                           SlideTransition(position: offsetAnimation, child: child),
@@ -209,8 +226,10 @@ class _HomePageState extends State<HomePage> {
                 curve: Curves.easeInOut,
                 padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Colors.blueAccent, Colors.deepPurpleAccent],
+                  gradient: LinearGradient(
+                    colors: widget.isDarkMode
+                        ? [ Colors.deepPurpleAccent,Colors.blueAccent ]
+                        : [Colors.blueAccent, Colors.deepPurpleAccent],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -230,11 +249,7 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(width: 8),
                     Text(
                       'About',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
                     ),
                   ],
                 ),
