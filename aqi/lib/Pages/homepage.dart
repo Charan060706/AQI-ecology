@@ -122,7 +122,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           child: AppBar(
-            title: const Text('Home Page'),
+            title: const Text('Air Index'),
             backgroundColor: Colors.transparent, // Make AppBar transparent to show gradient
             elevation: 0, // Remove shadow for a modern look
             actions: [
@@ -153,8 +153,8 @@ class _HomePageState extends State<HomePage> {
               ),
               elevation: 2,
               child: SizedBox(
-                width: 350,
-                height: 500,
+                width: 375,
+                height: 550,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Stack(
