@@ -183,7 +183,22 @@ class _AboutPageState extends State<AboutPage> {
                     "Dr. Suresh Jain",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
+                  Text(
+                    "Project Mentor",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal),
+                  ),
+                  SizedBox(height: 10), // Spacing between heading and image
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: AssetImage("assets/mentor.png"),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    "Vishal",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
                 ],
+                
               ),
               SizedBox(height: 40), // Increased space before teams
 
