@@ -14,11 +14,11 @@ class _AboutPageState extends State<AboutPage> {
   final List<String> descriptions = [
     "This is an innovative app built by B-Tech students. It focuses on sustainability and technology. Our team worked hard to integrate new solutions.",
     "We have used multiple sensors, including:\n"
-        "- BME280 (Pressure, Temperature, and Humidity Sensor)\n"
+        "- BMP280 (Pressure, Temperature, and Humidity Sensor)\n"
         "- MICS-6814 (Gas Sensor)\n"
         "- ESP-32 (Microcontroller)\n"
         "- LoRa module (for data transfer).",
-    "BME280 is a high-precision environmental sensor designed to measure temperature, pressure, and humidity in a single compact module, making it highly efficient for IoT and weather monitoring applications.\n\n"
+    "BMP280 is a high-precision environmental sensor designed to measure temperature, pressure, and humidity in a single compact module, making it highly efficient for IoT and weather monitoring applications.\n\n"
         "**Advantages:**\n"
         "Low power consumption\n"
         "Factory-calibrated for long-term stability\n"
@@ -41,7 +41,7 @@ class _AboutPageState extends State<AboutPage> {
   ];
 
   final List<Map<String, String>> sensorData = [
-    {"image": "assets/bme280.png", "name": "BME280 Sensor"},
+    {"image": "assets/bme280.png", "name": "BMP280 Sensor"},
     {"image": "assets/mics6814.png", "name": "MICS-6814 Gas Sensor"},
     {"image": "assets/esp32.png", "name": "ESP-32 Microcontroller"},
     {"image": "assets/lora.png", "name": "LoRa Module"},

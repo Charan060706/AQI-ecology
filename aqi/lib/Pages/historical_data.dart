@@ -97,17 +97,17 @@ class _HistoricalDataPageState extends State<HistoricalDataPage>
                     items: List.generate(_dataSets.length, (index) {
                       return _buildChart(
                         title: index == 0
-                            ? 'NO Levels Over Time'
+                            ? 'NO2 Levels Over Time'
                             : index == 1
-                                ? 'CH4 Levels Over Time'
+                                ? 'CO Levels Over Time'
                                 : 'NH3 Levels Over Time',
                         spots: _dataSets[index],
                         color: _colors[index],
                         xAxisTitle: 'Time',
                         yAxisTitle: index == 0
-                            ? 'NO Concentration (ppm)'
+                            ? 'NO2 Concentration (ppm)'
                             : index == 1
-                                ? 'CH4 Concentration (ppm)'
+                                ? 'CO Concentration (ppm)'
                                 : 'NH3 Concentration (ppm)',
                         isAnimated: index == _currentIndex,
                       );
