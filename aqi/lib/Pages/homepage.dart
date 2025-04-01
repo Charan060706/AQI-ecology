@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
                     },
                     child: Icon(
                       Icons.location_pin,
-                      color: widget.isDarkMode ? Colors.orangeAccent : Colors.red,
+                      color: widget.isDarkMode ? Colors.greenAccent : Colors.pinkAccent,
                       size: 40,
                     ),
                   ),
@@ -109,146 +109,272 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: widget.isDarkMode ? Colors.black : Colors.grey[900],
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(56.0),
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: widget.isDarkMode
-                  ? [Colors.black, Colors.white54] // Dark Mode: Black → White gradient
-                  : [Colors.blue, Colors.lightBlueAccent], // Light Mode: Blue → Light Blue gradient
+                  ? [Colors.purple.shade900, Colors.cyan.shade700] // Dark neon gradient
+                  : [Colors.deepPurple.shade600, Colors.cyan.shade400], // Light neon gradient
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: widget.isDarkMode ? Colors.cyanAccent.withOpacity(0.5) : Colors.pinkAccent.withOpacity(0.5),
+                blurRadius: 10,
+                spreadRadius: 1,
+              ),
+            ],
           ),
           child: AppBar(
-            title: const Text('Air Index'),
-            backgroundColor: Colors.transparent, // Make AppBar transparent to show gradient
-            elevation: 0, // Remove shadow for a modern look
+            title: Text(
+              'Air Index',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                foreground: Paint()
+                  ..shader = LinearGradient(
+                    colors: widget.isDarkMode
+                        ? [Colors.cyanAccent, Colors.pinkAccent]
+                        : [Colors.greenAccent, Colors.yellowAccent],
+                  ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)),
+                shadows: [
+                  Shadow(
+                    blurRadius: 10.0,
+                    color: widget.isDarkMode ? Colors.cyanAccent : Colors.pinkAccent,
+                    offset: const Offset(0, 0),
+                  ),
+                ],
+              ),
+            ),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
             actions: [
-              IconButton(
-                icon: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 500),
-                  transitionBuilder: (child, animation) {
-                    return RotationTransition(turns: animation, child: child);
-                  },
-                  child: widget.isDarkMode
-                      ? const Icon(Icons.dark_mode, key: ValueKey('dark'), color: Colors.white)
-                      : const Icon(Icons.wb_sunny, key: ValueKey('light'), color: Colors.orange),
+              Container(
+                margin: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(
+                    color: widget.isDarkMode ? Colors.cyanAccent : Colors.pinkAccent,
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: widget.isDarkMode ? Colors.cyanAccent.withOpacity(0.5) : Colors.pinkAccent.withOpacity(0.5),
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                    ),
+                  ],
                 ),
-                onPressed: widget.toggleTheme,
+                child: IconButton(
+                  icon: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    transitionBuilder: (child, animation) {
+                      return RotationTransition(turns: animation, child: child);
+                    },
+                    child: widget.isDarkMode
+                        ? const Icon(Icons.dark_mode, key: ValueKey('dark'), color: Colors.cyanAccent)
+                        : const Icon(Icons.wb_sunny, key: ValueKey('light'), color: Colors.pinkAccent),
+                  ),
+                  onPressed: widget.toggleTheme,
+                ),
               ),
             ],
           ),
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Card(
-              color: widget.isDarkMode ? Colors.grey[900] : Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 2,
-              child: SizedBox(
-                width: 375,
-                height: 550,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Stack(
-                    children: [
-                      FlutterMap(
-                        mapController: _mapController,
-                        options: MapOptions(
-                          initialCenter: _markers.isNotEmpty
-                              ? _markers[0].point
-                              : LatLng(13.7072, 79.5945),
-                          initialZoom: _zoomLevel,
-                          interactionOptions: const InteractionOptions(flags: InteractiveFlag.all),
-                        ),
-                        children: [
-                          TileLayer(
-                            urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                            subdomains: ['a', 'b', 'c'],
-                          ),
-                          MarkerLayer(markers: _markers),
-                        ],
-                      ),
-                      Positioned(
-                        right: 10,
-                        bottom: 10,
-                        child: Column(
-                          children: [
-                            FloatingActionButton(
-                              mini: true,
-                              backgroundColor: widget.isDarkMode ? Colors.white24 : Colors.blue,
-                              heroTag: "zoom_in",
-                              onPressed: _zoomIn,
-                              child: const Icon(Icons.add),
-                            ),
-                            const SizedBox(height: 5),
-                            FloatingActionButton(
-                              mini: true,
-                              backgroundColor: widget.isDarkMode ? Colors.white24 : Colors.blue,
-                              heroTag: "zoom_out",
-                              onPressed: _zoomOut,
-                              child: const Icon(Icons.remove),
-                            ),
-                          ],
-                        ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: widget.isDarkMode
+                ? [Colors.black, Colors.purple.shade900]
+                : [Colors.grey.shade900, Colors.deepPurple.shade800],
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Card(
+                color: widget.isDarkMode ? Colors.black : Colors.grey[850],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(
+                    color: widget.isDarkMode ? Colors.cyanAccent : Colors.pinkAccent,
+                    width: 2,
+                  ),
+                ),
+                elevation: 8,
+                shadowColor: widget.isDarkMode ? Colors.cyanAccent.withOpacity(0.5) : Colors.pinkAccent.withOpacity(0.5),
+                child: Container(
+                  width: 375,
+                  height: 550,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: widget.isDarkMode ? Colors.cyanAccent.withOpacity(0.3) : Colors.pinkAccent.withOpacity(0.3),
+                        blurRadius: 15,
+                        spreadRadius: -5,
+                        offset: const Offset(0, 0),
                       ),
                     ],
                   ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(18),
+                    child: Stack(
+                      children: [
+                        // Map section - unchanged as requested
+                        FlutterMap(
+                          mapController: _mapController,
+                          options: MapOptions(
+                            initialCenter: _markers.isNotEmpty
+                                ? _markers[0].point
+                                : LatLng(13.7072, 79.5945),
+                            initialZoom: _zoomLevel,
+                            interactionOptions: const InteractionOptions(flags: InteractiveFlag.all),
+                          ),
+                          children: [
+                            TileLayer(
+                              urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                              subdomains: ['a', 'b', 'c'],
+                            ),
+                            MarkerLayer(markers: _markers),
+                          ],
+                        ),
+                        // Zoom controls - updated styling
+                        Positioned(
+                          right: 12,
+                          bottom: 12,
+                          child: Column(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: widget.isDarkMode ? Colors.cyanAccent.withOpacity(0.5) : Colors.pinkAccent.withOpacity(0.5),
+                                      blurRadius: 8,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
+                                ),
+                                child: FloatingActionButton(
+                                  mini: true,
+                                  backgroundColor: widget.isDarkMode ? Colors.black : Colors.grey[850],
+                                  heroTag: "zoom_in",
+                                  onPressed: _zoomIn,
+                                  child: Icon(
+                                    Icons.add,
+                                    color: widget.isDarkMode ? Colors.cyanAccent : Colors.pinkAccent,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: widget.isDarkMode ? Colors.cyanAccent.withOpacity(0.5) : Colors.pinkAccent.withOpacity(0.5),
+                                      blurRadius: 8,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
+                                ),
+                                child: FloatingActionButton(
+                                  mini: true,
+                                  backgroundColor: widget.isDarkMode ? Colors.black : Colors.grey[850],
+                                  heroTag: "zoom_out",
+                                  onPressed: _zoomOut,
+                                  child: Icon(
+                                    Icons.remove,
+                                    color: widget.isDarkMode ? Colors.cyanAccent : Colors.pinkAccent,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            InkWell(
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) =>  AboutPage()),
-                );
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeInOut,
-                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+              const SizedBox(height: 25),
+              Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: widget.isDarkMode
-                        ? [Colors.deepPurpleAccent, Colors.blueAccent]
-                        : [Colors.blueAccent, Colors.deepPurpleAccent],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
+                      color: widget.isDarkMode ? Colors.cyanAccent.withOpacity(0.6) : Colors.pinkAccent.withOpacity(0.6),
+                      blurRadius: 15,
+                      spreadRadius: 1,
                     ),
                   ],
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.info_outline, size: 24, color: Colors.white),
-                    SizedBox(width: 8),
-                    Text(
-                      'About',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => AboutPage()),
+                    );
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeInOut,
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 28),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: widget.isDarkMode
+                            ? [Colors.deepPurple.shade900, Colors.cyan.shade800]
+                            : [Colors.pinkAccent, Colors.deepPurpleAccent],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: widget.isDarkMode ? Colors.cyanAccent : Colors.yellowAccent,
+                        width: 2,
+                      ),
                     ),
-                  ],
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          size: 26,
+                          color: widget.isDarkMode ? Colors.cyanAccent : Colors.white,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'About',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 10.0,
+                                color: widget.isDarkMode ? Colors.cyanAccent : Colors.pinkAccent,
+                                offset: const Offset(0, 0),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
-

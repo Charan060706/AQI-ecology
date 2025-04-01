@@ -6,7 +6,6 @@ import 'Pages/about.dart';
 import 'package:flutter/material.dart';
 import 'Pages/location_page.dart';
 import 'Pages/historical_data.dart';
-import 'Pages/Hello.dart';
 import 'Pages/gradientWrap.dart'; // Import the GradientWrapper
 
 void main() async {
