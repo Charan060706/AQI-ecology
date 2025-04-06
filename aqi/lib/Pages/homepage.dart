@@ -16,7 +16,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   final MapController _mapController = MapController();
   double _zoomLevel = 14.0;
   final List<Marker> _markers = [];
@@ -45,11 +45,9 @@ class _HomePageState extends State<HomePage> {
                     onTap: () {
                       Navigator.of(context).push(
                         PageRouteBuilder(
-                          pageBuilder: (context, animation, secondaryAnimation) =>
-                              const LocationPage(),
+                          pageBuilder: (context, animation, secondaryAnimation) => const LocationPage(),
                           transitionDuration: const Duration(milliseconds: 500),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
+                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
                             var begin = const Offset(0.0, 1.0);
                             var end = Offset.zero;
                             var curve = Curves.easeInOut;
@@ -63,8 +61,7 @@ class _HomePageState extends State<HomePage> {
                                 Positioned.fill(
                                   child: BackdropFilter(
                                     filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                                    child: Container(
-                                        color: Colors.black.withOpacity(0.5)),
+                                    child: Container(color: Colors.black.withOpacity(0.5)),
                                   ),
                                 ),
                                 SlideTransition(position: offsetAnimation, child: child),
@@ -86,7 +83,6 @@ class _HomePageState extends State<HomePage> {
           }
         });
       }
-      setState(() {});
     }).catchError((error) {
       print("Error fetching locations: $error");
     });
@@ -115,28 +111,50 @@ class _HomePageState extends State<HomePage> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: widget.isDarkMode
-                  ? [Colors.black, Colors.white54] // Dark Mode: Black → White gradient
-                  : [Colors.blue, Colors.lightBlueAccent], // Light Mode: Blue → Light Blue gradient
+                  ? [Colors.black, Colors.white54]
+                  : [Colors.blue, Colors.lightBlueAccent],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
           ),
           child: AppBar(
             title: const Text('Air Index'),
-            backgroundColor: Colors.transparent, // Make AppBar transparent to show gradient
-            elevation: 0, // Remove shadow for a modern look
+            backgroundColor: Colors.transparent,
+            elevation: 0,
             actions: [
-              IconButton(
-                icon: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 500),
-                  transitionBuilder: (child, animation) {
-                    return RotationTransition(turns: animation, child: child);
-                  },
-                  child: widget.isDarkMode
-                      ? const Icon(Icons.dark_mode, key: ValueKey('dark'), color: Colors.white)
-                      : const Icon(Icons.wb_sunny, key: ValueKey('light'), color: Colors.orange),
+              Padding(
+                padding: const EdgeInsets.only(right: 12.0),
+                child: GestureDetector(
+                  onTap: widget.toggleTheme,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 600),
+                    transitionBuilder: (child, animation) {
+                      return RotationTransition(
+                        turns: animation,
+                        child: ScaleTransition(scale: animation, child: child),
+                      );
+                    },
+                    child: Container(
+                      key: ValueKey(widget.isDarkMode),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: widget.isDarkMode
+                              ? [Colors.orangeAccent.withOpacity(0.6), Colors.transparent]
+                              : [Colors.yellowAccent.withOpacity(0.6), Colors.transparent],
+                          center: Alignment.center,
+                          radius: 0.8,
+                        ),
+                      ),
+                      child: Icon(
+                        widget.isDarkMode ? Icons.dark_mode : Icons.wb_sunny,
+                        color: widget.isDarkMode ? Colors.white : Colors.orange,
+                        size: 28,
+                      ),
+                    ),
+                  ),
                 ),
-                onPressed: widget.toggleTheme,
               ),
             ],
           ),
@@ -208,7 +226,7 @@ class _HomePageState extends State<HomePage> {
             InkWell(
               onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) =>  AboutPage()),
+                  MaterialPageRoute(builder: (context) => AboutPage()),
                 );
               },
               child: AnimatedContainer(
@@ -251,4 +269,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
