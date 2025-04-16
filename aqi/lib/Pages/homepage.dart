@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
                     },
                     child: Icon(
                       Icons.location_pin,
-                      color: widget.isDarkMode ? Colors.greenAccent : Colors.pinkAccent,
+                      color: widget.isDarkMode ? Colors.green : Colors.teal,
                       size: 40,
                     ),
                   ),
@@ -109,22 +109,23 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: widget.isDarkMode ? Colors.black : Colors.grey[900],
+      backgroundColor: widget.isDarkMode ? Color(0xFF1A2421) : Colors.white,
+     // extendBodyBehindAppBar: False,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(56.0),
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: widget.isDarkMode
-                  ? [Colors.purple.shade900, Colors.cyan.shade700] // Dark neon gradient
-                  : [Colors.deepPurple.shade600, Colors.cyan.shade400], // Light neon gradient
+                  ? [Color(0xFF2A4D48), Color(0xFF1A302B)] // Dark forest gradient
+                  : [Color(0xFF4CAF50), Color(0xFF2E7D32)], // Light forest gradient
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
             boxShadow: [
               BoxShadow(
-                color: widget.isDarkMode ? Colors.cyanAccent.withOpacity(0.5) : Colors.pinkAccent.withOpacity(0.5),
-                blurRadius: 10,
+                color: widget.isDarkMode ? Colors.black.withOpacity(0.5) : Colors.green.withOpacity(0.3),
+                blurRadius: 6,
                 spreadRadius: 1,
               ),
             ],
@@ -138,14 +139,14 @@ class _HomePageState extends State<HomePage> {
                 foreground: Paint()
                   ..shader = LinearGradient(
                     colors: widget.isDarkMode
-                        ? [Colors.cyanAccent, Colors.pinkAccent]
-                        : [Colors.greenAccent, Colors.yellowAccent],
+                        ? [Colors.lightGreenAccent, Colors.lightBlue]
+                        : [Colors.white, Colors.lightGreenAccent],
                   ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)),
                 shadows: [
                   Shadow(
-                    blurRadius: 10.0,
-                    color: widget.isDarkMode ? Colors.cyanAccent : Colors.pinkAccent,
-                    offset: const Offset(0, 0),
+                    blurRadius: 6.0,
+                    color: widget.isDarkMode ? Colors.black54 : Colors.green.shade800,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
@@ -158,14 +159,14 @@ class _HomePageState extends State<HomePage> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(30),
                   border: Border.all(
-                    color: widget.isDarkMode ? Colors.cyanAccent : Colors.pinkAccent,
+                    color: widget.isDarkMode ? Colors.lightGreenAccent : Colors.green,
                     width: 2,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: widget.isDarkMode ? Colors.cyanAccent.withOpacity(0.5) : Colors.pinkAccent.withOpacity(0.5),
-                      blurRadius: 8,
-                      spreadRadius: 1,
+                      color: widget.isDarkMode ? Colors.black.withOpacity(0.3) : Colors.green.withOpacity(0.3),
+                      blurRadius: 4,
+                      spreadRadius: 0,
                     ),
                   ],
                 ),
@@ -176,8 +177,8 @@ class _HomePageState extends State<HomePage> {
                       return RotationTransition(turns: animation, child: child);
                     },
                     child: widget.isDarkMode
-                        ? const Icon(Icons.dark_mode, key: ValueKey('dark'), color: Colors.cyanAccent)
-                        : const Icon(Icons.wb_sunny, key: ValueKey('light'), color: Colors.pinkAccent),
+                        ? const Icon(Icons.dark_mode, key: ValueKey('dark'), color: Colors.lightGreenAccent)
+                        : const Icon(Icons.wb_sunny, key: ValueKey('light'), color: Colors.green),
                   ),
                   onPressed: widget.toggleTheme,
                 ),
@@ -186,194 +187,208 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: widget.isDarkMode
-                ? [Colors.black, Colors.purple.shade900]
-                : [Colors.grey.shade900, Colors.deepPurple.shade800],
+      body: Stack(
+        children: [
+          // Background image with low transparency
+          Positioned.fill(
+            child: Image.network(
+              widget.isDarkMode 
+                  ? "https://images.unsplash.com/photo-1502082553048-f009c37129b9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" // Dark forest
+                  : "https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80", // Light forest
+              fit: BoxFit.cover,
+              opacity: const AlwaysStoppedAnimation(1),
+            ),
           ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Card(
-                color: widget.isDarkMode ? Colors.black : Colors.grey[850],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  side: BorderSide(
-                    color: widget.isDarkMode ? Colors.cyanAccent : Colors.pinkAccent,
-                    width: 2,
-                  ),
-                ),
-                elevation: 8,
-                shadowColor: widget.isDarkMode ? Colors.cyanAccent.withOpacity(0.5) : Colors.pinkAccent.withOpacity(0.5),
-                child: Container(
-                  width: 375,
-                  height: 550,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: widget.isDarkMode ? Colors.cyanAccent.withOpacity(0.3) : Colors.pinkAccent.withOpacity(0.3),
-                        blurRadius: 15,
-                        spreadRadius: -5,
-                        offset: const Offset(0, 0),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(18),
-                    child: Stack(
-                      children: [
-                        // Map section - unchanged as requested
-                        FlutterMap(
-                          mapController: _mapController,
-                          options: MapOptions(
-                            initialCenter: _markers.isNotEmpty
-                                ? _markers[0].point
-                                : LatLng(13.7072, 79.5945),
-                            initialZoom: _zoomLevel,
-                            interactionOptions: const InteractionOptions(flags: InteractiveFlag.all),
-                          ),
-                          children: [
-                            TileLayer(
-                              urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                              subdomains: ['a', 'b', 'c'],
-                            ),
-                            MarkerLayer(markers: _markers),
-                          ],
-                        ),
-                        // Zoom controls - updated styling
-                        Positioned(
-                          right: 12,
-                          bottom: 12,
-                          child: Column(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: widget.isDarkMode ? Colors.cyanAccent.withOpacity(0.5) : Colors.pinkAccent.withOpacity(0.5),
-                                      blurRadius: 8,
-                                      spreadRadius: 1,
-                                    ),
-                                  ],
-                                ),
-                                child: FloatingActionButton(
-                                  mini: true,
-                                  backgroundColor: widget.isDarkMode ? Colors.black : Colors.grey[850],
-                                  heroTag: "zoom_in",
-                                  onPressed: _zoomIn,
-                                  child: Icon(
-                                    Icons.add,
-                                    color: widget.isDarkMode ? Colors.cyanAccent : Colors.pinkAccent,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: widget.isDarkMode ? Colors.cyanAccent.withOpacity(0.5) : Colors.pinkAccent.withOpacity(0.5),
-                                      blurRadius: 8,
-                                      spreadRadius: 1,
-                                    ),
-                                  ],
-                                ),
-                                child: FloatingActionButton(
-                                  mini: true,
-                                  backgroundColor: widget.isDarkMode ? Colors.black : Colors.grey[850],
-                                  heroTag: "zoom_out",
-                                  onPressed: _zoomOut,
-                                  child: Icon(
-                                    Icons.remove,
-                                    color: widget.isDarkMode ? Colors.cyanAccent : Colors.pinkAccent,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: widget.isDarkMode
+                    ? [Color(0xAA1A2421), Color(0xBB2A4D48)]
+                    : [Color(0x99FFFFFF), Color(0xAAE8F5E9)],
               ),
-              const SizedBox(height: 25),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: widget.isDarkMode ? Colors.cyanAccent.withOpacity(0.6) : Colors.pinkAccent.withOpacity(0.6),
-                      blurRadius: 15,
-                      spreadRadius: 1,
-                    ),
-                  ],
-                ),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => AboutPage()),
-                    );
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.easeInOut,
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 28),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: widget.isDarkMode
-                            ? [Colors.deepPurple.shade900, Colors.cyan.shade800]
-                            : [Colors.pinkAccent, Colors.deepPurpleAccent],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: widget.isDarkMode ? Colors.cyanAccent : Colors.yellowAccent,
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Card(
+                    color: widget.isDarkMode ? Color(0xCC1A2421) : Colors.white.withOpacity(0.85),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(
+                        color: widget.isDarkMode ? Colors.lightGreenAccent : Colors.green,
                         width: 2,
                       ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          size: 26,
-                          color: widget.isDarkMode ? Colors.cyanAccent : Colors.white,
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          'About',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            shadows: [
-                              Shadow(
-                                blurRadius: 10.0,
-                                color: widget.isDarkMode ? Colors.cyanAccent : Colors.pinkAccent,
-                                offset: const Offset(0, 0),
-                              ),
-                            ],
+                    elevation: 8,
+                    shadowColor: widget.isDarkMode ? Colors.black.withOpacity(0.5) : Colors.green.withOpacity(0.3),
+                    child: Container(
+                      width: 375,
+                      height: 550,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: widget.isDarkMode ? Colors.black.withOpacity(0.3) : Colors.green.withOpacity(0.2),
+                            blurRadius: 10,
+                            spreadRadius: -3,
+                            offset: const Offset(0, 0),
                           ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(18),
+                        child: Stack(
+                          children: [
+                            // Map section
+                            FlutterMap(
+                              mapController: _mapController,
+                              options: MapOptions(
+                                initialCenter: _markers.isNotEmpty
+                                    ? _markers[0].point
+                                    : LatLng(13.7072, 79.5945),
+                                initialZoom: _zoomLevel,
+                                interactionOptions: const InteractionOptions(flags: InteractiveFlag.all),
+                              ),
+                              children: [
+                                TileLayer(
+                                  urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                                  subdomains: ['a', 'b', 'c'],
+                                ),
+                                MarkerLayer(markers: _markers),
+                              ],
+                            ),
+                            // Zoom controls - updated styling
+                            Positioned(
+                              right: 12,
+                              bottom: 12,
+                              child: Column(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: widget.isDarkMode ? Colors.black.withOpacity(0.4) : Colors.green.withOpacity(0.3),
+                                          blurRadius: 4,
+                                          spreadRadius: 0,
+                                        ),
+                                      ],
+                                    ),
+                                    child: FloatingActionButton(
+                                      mini: true,
+                                      backgroundColor: widget.isDarkMode ? Color(0xDD1A2421) : Colors.white,
+                                      heroTag: "zoom_in",
+                                      onPressed: _zoomIn,
+                                      child: Icon(
+                                        Icons.add,
+                                        color: widget.isDarkMode ? Colors.lightGreenAccent : Colors.green,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: widget.isDarkMode ? Colors.black.withOpacity(0.4) : Colors.green.withOpacity(0.3),
+                                          blurRadius: 4,
+                                          spreadRadius: 0,
+                                        ),
+                                      ],
+                                    ),
+                                    child: FloatingActionButton(
+                                      mini: true,
+                                      backgroundColor: widget.isDarkMode ? Color(0xDD1A2421) : Colors.white,
+                                      heroTag: "zoom_out",
+                                      onPressed: _zoomOut,
+                                      child: Icon(
+                                        Icons.remove,
+                                        color: widget.isDarkMode ? Colors.lightGreenAccent : Colors.green,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 25),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: widget.isDarkMode ? Colors.black.withOpacity(0.5) : Colors.green.withOpacity(0.3),
+                          blurRadius: 8,
+                          spreadRadius: 0,
                         ),
                       ],
                     ),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => AboutPage()),
+                        );
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeInOut,
+                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 28),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: widget.isDarkMode
+                                ? [Color(0xFF2A4D48), Color(0xFF1F3933)]
+                                : [Color(0xFF4CAF50), Color(0xFF2E7D32)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: widget.isDarkMode ? Colors.lightGreenAccent : Colors.green.shade300,
+                            width: 2,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 26,
+                              color: widget.isDarkMode ? Colors.lightGreenAccent : Colors.white,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'About',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                shadows: [
+                                  Shadow(
+                                    blurRadius: 4.0,
+                                    color: widget.isDarkMode ? Colors.black : Colors.green.shade800,
+                                    offset: const Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
