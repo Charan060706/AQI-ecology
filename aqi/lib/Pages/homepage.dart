@@ -30,66 +30,84 @@ class _HomePageState extends State<HomePage> {
   void _fetchLocations() async {
     FirebaseFirestore.instance.collection('locations').get().then((snapshot) {
       for (var doc in snapshot.docs) {
-        doc.data().forEach((key, value) {
+        final data = doc.data();
+
+        for (var key in data.keys) {
+          final value = data[key];
+
+          // Case 1: GeoPoint field (like: location1: GeoPoint)
           if (value is GeoPoint) {
             double lat = value.latitude;
             double lng = value.longitude;
 
-            setState(() {
-              _markers.add(
-                Marker(
-                  point: LatLng(lat, lng),
-                  width: 40,
-                  height: 40,
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation, secondaryAnimation) =>
-                              const LocationPage(),
-                          transitionDuration: const Duration(milliseconds: 500),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            var begin = const Offset(0.0, 1.0);
-                            var end = Offset.zero;
-                            var curve = Curves.easeInOut;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-                            var offsetAnimation = animation.drive(tween);
-
-                            return Stack(
-                              children: [
-                                Positioned.fill(
-                                  child: BackdropFilter(
-                                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                                    child: Container(
-                                        color: Colors.black.withOpacity(0.5)),
-                                  ),
-                                ),
-                                SlideTransition(position: offsetAnimation, child: child),
-                              ],
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    child: Icon(
-                      Icons.location_pin,
-                      color: widget.isDarkMode ? Colors.orangeAccent : Colors.red,
-                      size: 40,
-                    ),
-                  ),
-                ),
-              );
-            });
+            _addMarker(lat, lng);
           }
-        });
+
+          // Case 2: lat and long fields (like: lat: 13.7, long: 79.5)
+          else if (data.containsKey('lat') && data.containsKey('long')) {
+            final lat = data['lat'];
+            final lng = data['long'];
+
+            if (lat is num && lng is num) {
+              _addMarker(lat.toDouble(), lng.toDouble());
+            }
+          }
+        }
       }
+
       setState(() {});
     }).catchError((error) {
       print("Error fetching locations: $error");
     });
+  }
+
+  void _addMarker(double lat, double lng) {
+    _markers.add(
+      Marker(
+        point: LatLng(lat, lng),
+        width: 40,
+        height: 40,
+        child: GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const LocationPage(),
+                transitionDuration: const Duration(milliseconds: 500),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  var begin = const Offset(0.0, 1.0);
+                  var end = Offset.zero;
+                  var curve = Curves.easeInOut;
+
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+
+                  return Stack(
+                    children: [
+                      Positioned.fill(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                          child: Container(
+                              color: Colors.black.withOpacity(0.5)),
+                        ),
+                      ),
+                      SlideTransition(position: offsetAnimation, child: child),
+                    ],
+                  );
+                },
+              ),
+            );
+          },
+          child: Icon(
+            Icons.location_pin,
+            color: widget.isDarkMode ? Colors.orangeAccent : Colors.red,
+            size: 40,
+          ),
+        ),
+      ),
+    );
   }
 
   void _zoomIn() {
@@ -115,16 +133,16 @@ class _HomePageState extends State<HomePage> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: widget.isDarkMode
-                  ? [Colors.black, Colors.white54] // Dark Mode: Black → White gradient
-                  : [Colors.blue, Colors.lightBlueAccent], // Light Mode: Blue → Light Blue gradient
+                  ? [Colors.black, Colors.white54]
+                  : [Colors.blue, Colors.lightBlueAccent],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
           ),
           child: AppBar(
             title: const Text('Air Index'),
-            backgroundColor: Colors.transparent, // Make AppBar transparent to show gradient
-            elevation: 0, // Remove shadow for a modern look
+            backgroundColor: Colors.transparent,
+            elevation: 0,
             actions: [
               IconButton(
                 icon: AnimatedSwitcher(
@@ -251,4 +269,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
