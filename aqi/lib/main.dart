@@ -1,12 +1,11 @@
 import 'package:aqi/Pages/homepage.dart';
 import 'package:aqi/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
-
 import 'Pages/about.dart';
 import 'package:flutter/material.dart';
 import 'Pages/location_page.dart';
 import 'Pages/historical_data.dart';
-import 'Pages/gradientWrap.dart'; // Import the GradientWrapper
+import 'Pages/gradientWrap.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +21,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool isDarkMode = false; // Global theme state
+  bool isDarkMode = false;
 
   void toggleTheme() {
     setState(() {
@@ -35,14 +34,39 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Flutter App',
       debugShowCheckedModeBanner: false,
-      theme: isDarkMode ? ThemeData.dark() : ThemeData.light(), // Apply theme dynamically
+      theme: isDarkMode ? ThemeData.dark() : ThemeData.light(),
       initialRoute: '/home',
-      routes: {
-        //'/': (context) => GradientWrapper(child: Hello(toggleTheme: toggleTheme, isDarkMode: isDarkMode)), 
-        '/home': (context) => GradientWrapper(child: HomePage(toggleTheme: toggleTheme, isDarkMode: isDarkMode)),
-        '/location': (context) => GradientWrapper(child: LocationPage()),
-        '/historical': (context) => GradientWrapper(child: HistoricalDataPage()),
-        '/about': (context) => GradientWrapper(child: AboutPage()),
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case '/home':
+            return MaterialPageRoute(
+              builder: (_) => GradientWrapper(
+                child: HomePage(toggleTheme: toggleTheme, isDarkMode: isDarkMode),
+              ),
+            );
+          case '/location':
+            return MaterialPageRoute(
+              builder: (_) => const GradientWrapper(
+                child: LocationPage(lat: 0.0, lng: 0.0),
+              ),
+            );
+          case '/historical':
+            final args = settings.arguments as Map<String, double>;
+            return MaterialPageRoute(
+              builder: (_) => GradientWrapper(
+                child: HistoricalDataPage(
+                  latitude: args['latitude']!,
+                  longitude: args['longitude']!,
+                ),
+              ),
+            );
+          case '/about':
+            return MaterialPageRoute(
+              builder: (_) => GradientWrapper(child: AboutPage())
+            );
+          default:
+            return null;
+        }
       },
     );
   }

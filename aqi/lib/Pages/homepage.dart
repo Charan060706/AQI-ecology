@@ -1,3 +1,4 @@
+/// homepage.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -27,40 +28,6 @@ class _HomePageState extends State<HomePage> {
     _fetchLocations();
   }
 
-  void _fetchLocations() async {
-    FirebaseFirestore.instance.collection('locations').get().then((snapshot) {
-      for (var doc in snapshot.docs) {
-        final data = doc.data();
-
-        for (var key in data.keys) {
-          final value = data[key];
-
-          // Case 1: GeoPoint field (like: location1: GeoPoint)
-          if (value is GeoPoint) {
-            double lat = value.latitude;
-            double lng = value.longitude;
-
-            _addMarker(lat, lng);
-          }
-
-          // Case 2: lat and long fields (like: lat: 13.7, long: 79.5)
-          else if (data.containsKey('lat') && data.containsKey('long')) {
-            final lat = data['lat'];
-            final lng = data['long'];
-
-            if (lat is num && lng is num) {
-              _addMarker(lat.toDouble(), lng.toDouble());
-            }
-          }
-        }
-      }
-
-      setState(() {});
-    }).catchError((error) {
-      print("Error fetching locations: $error");
-    });
-  }
-
   void _addMarker(double lat, double lng) {
     _markers.add(
       Marker(
@@ -72,16 +39,13 @@ class _HomePageState extends State<HomePage> {
             Navigator.of(context).push(
               PageRouteBuilder(
                 pageBuilder: (context, animation, secondaryAnimation) =>
-                    const LocationPage(),
+                    LocationPage(lat: lat, lng: lng),
                 transitionDuration: const Duration(milliseconds: 500),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
                   var begin = const Offset(0.0, 1.0);
                   var end = Offset.zero;
                   var curve = Curves.easeInOut;
-
-                  var tween = Tween(begin: begin, end: end)
-                      .chain(CurveTween(curve: curve));
+                  var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
                   var offsetAnimation = animation.drive(tween);
 
                   return Stack(
@@ -89,8 +53,7 @@ class _HomePageState extends State<HomePage> {
                       Positioned.fill(
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                          child: Container(
-                              color: Colors.black.withOpacity(0.5)),
+                          child: Container(color: Colors.black.withOpacity(0.5)),
                         ),
                       ),
                       SlideTransition(position: offsetAnimation, child: child),
@@ -108,6 +71,37 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  void _fetchLocations() async {
+    FirebaseFirestore.instance.collection('locations').get().then((snapshot) {
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        for (var entry in data.entries) {
+          final value = entry.value;
+
+          if (value is GeoPoint) {
+            _addMarker(value.latitude, value.longitude);
+          } else if (value is Map && value.containsKey('lat') && value.containsKey('long')) {
+            final lat = value['lat'];
+            final lng = value['long'];
+            if (lat is num && lng is num) {
+              _addMarker(lat.toDouble(), lng.toDouble());
+            }
+          } else if (data.containsKey('lat') && data.containsKey('long')) {
+            final lat = data['lat'];
+            final lng = data['long'];
+            if (lat is num && lng is num) {
+              _addMarker(lat.toDouble(), lng.toDouble());
+            }
+            break;
+          }
+        }
+      }
+      setState(() {});
+    }).catchError((error) {
+      print("Error fetching locations: $error");
+    });
   }
 
   void _zoomIn() {
@@ -226,7 +220,7 @@ class _HomePageState extends State<HomePage> {
             InkWell(
               onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) =>  AboutPage()),
+                  MaterialPageRoute(builder: (context) => AboutPage()),
                 );
               },
               child: AnimatedContainer(
