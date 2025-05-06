@@ -64,7 +64,7 @@ class _LocationPageState extends State<LocationPage> with SingleTickerProviderSt
               Colors.green,
               Icons.explore,
             ),
-            _buildParameterCard('Methane', 'CH₄', '100 μ % (v/v)', Colors.teal, Icons.local_fire_department),
+            _buildParameterCard('Carbon Monoxide', 'CO', '100 mg/m³', Colors.teal, Icons.local_fire_department),
             _buildParameterCard('Ammonia', 'NH₃', '17.38 μg/m³', Colors.amber, Icons.science),
             _buildParameterCard('Humidity', '', '32%', Colors.lightBlue, Icons.water_drop),
             _buildParameterCard('Nitrogen Dioxide', 'NO₂', '53 ppb', Colors.redAccent, Icons.cloud),
